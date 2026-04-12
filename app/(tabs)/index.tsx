@@ -16,6 +16,8 @@ const SHORTCUT_ICONS: Record<string, any> = {
   support: require("../../assets/icons/government_subsidies.png"),
   hospital: require("../../assets/icons/hospital.png"),
   community: require("../../assets/icons/community.png"),
+  ai_chat: require("../../assets/icons/ai_chat.png"),
+  youtube: require("../../assets/icons/youtube.png"),
 };
 
 function getGreeting() {
@@ -208,8 +210,8 @@ export default function HomeScreen() {
               { route: "/tips", iconKey: "tips", emoji: "💡", label: "주차별 꿀팁", desc: "지금 꼭 알아야 할 것", bg: "#FFF0F3" },
               { route: "/nutrition", iconKey: "nutrition", emoji: "💊", label: "영양제 가이드", desc: "엽산·철분 복용법", bg: "#FFF3B0" },
               { route: "/support/", iconKey: "support", emoji: "💰", label: "정부지원금", desc: "받을 수 있는 혜택", bg: "#F3EEFF" },
-              { route: "/(tabs)/chat", iconKey: null, emoji: "🤖", label: "AI 상담", desc: "궁금한 거 물어보기", bg: "#E8F8F0" },
-              { route: "/youtube", iconKey: null, emoji: "🎬", label: "임산부 영상", desc: "주차별 추천 영상", bg: "#E8F4FF" },
+              { route: "/(tabs)/chat", iconKey: "ai_chat", emoji: "🤖", label: "AI 상담", desc: "궁금한 거 물어보기", bg: "#E8F8F0" },
+              { route: "/youtube", iconKey: "youtube", emoji: "🎬", label: "임산부 영상", desc: "주차별 추천 영상", bg: "#E8F4FF" },
               { route: "/(tabs)/hospital", iconKey: "hospital", emoji: "🏥", label: "근처 보건소·병원", desc: "산부인과·보건소 찾기", bg: "#F0FFF0" },
             ].map((item) => (
               <TouchableOpacity

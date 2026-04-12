@@ -13,6 +13,7 @@ import {
 import { useLocalSearchParams } from "expo-router";
 import { useAuthStore } from "../../stores/authStore";
 import { searchNearbyHospitals, Hospital } from "../../lib/kakaoLocal";
+import { useHospitalStore } from "../../stores/hospitalStore";
 import { handleScroll } from "../../stores/uiStore";
 import { timeAgo } from "../../lib/utils";
 
@@ -69,6 +70,7 @@ function StarRating({
 export default function HospitalDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { profile } = useAuthStore();
+  const { isFavorite, addFavorite, removeFavorite, fetchFavorites } = useHospitalStore();
 
   const [hospital, setHospital] = useState<Hospital | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -77,9 +79,9 @@ export default function HospitalDetailScreen() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    // 데모에서 병원 찾기
     loadHospital();
     loadReviews();
+    fetchFavorites();
   }, [id]);
 
   const loadHospital = async () => {
@@ -149,12 +151,35 @@ export default function HospitalDetailScreen() {
           <Text style={{ fontSize: 22, fontWeight: "bold", color: "#2D2D2D" }}>
             {hospital.name}
           </Text>
-          <Text style={{ fontSize: 14, color: "#9B9B9B", marginTop: 6 }}>
-            📍 {hospital.roadAddress}
-          </Text>
-          <Text style={{ fontSize: 14, color: "#9B9B9B", marginTop: 4 }}>
-            📞 {hospital.phone}
-          </Text>
+          <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, color: "#9B9B9B", marginTop: 6 }}>
+                📍 {hospital.roadAddress}
+              </Text>
+              <Text style={{ fontSize: 14, color: "#9B9B9B", marginTop: 4 }}>
+                📞 {hospital.phone}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                if (isFavorite(hospital.id)) {
+                  removeFavorite(hospital.id);
+                } else {
+                  addFavorite(hospital);
+                }
+              }}
+              style={{
+                width: 44,
+                height: 44,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontSize: 26 }}>
+                {isFavorite(hospital.id) ? "💖" : "🤍"}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           {/* 평점 */}
           <View
@@ -210,6 +235,26 @@ export default function HospitalDetailScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+
+          {/* 네이버 예약/후기 */}
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL(
+                `https://m.search.naver.com/search.naver?where=nexearch&query=${encodeURIComponent(hospital.name + ' 산부인과')}`
+              )
+            }
+            style={{
+              backgroundColor: "#03C75A",
+              borderRadius: 12,
+              paddingVertical: 14,
+              alignItems: "center",
+              marginTop: 8,
+            }}
+          >
+            <Text style={{ color: "#FFF", fontWeight: "700", fontSize: 14 }}>
+              네이버 예약/후기 보기
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* 후기 작성 */}
