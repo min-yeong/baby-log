@@ -230,7 +230,7 @@ export default function HomeScreen() {
               >
                 <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: item.bg, alignItems: "center", justifyContent: "center", marginRight: 10 }}>
                   {item.iconKey && SHORTCUT_ICONS[item.iconKey] ? (
-                    <Image source={SHORTCUT_ICONS[item.iconKey]} style={{ width: 32, height: 32 }} contentFit="contain" />
+                    <Image source={SHORTCUT_ICONS[item.iconKey]} style={{ width: 40, height: 40, borderRadius: 10 }} contentFit="cover" />
                   ) : (
                     <Text style={{ fontSize: 20 }}>{item.emoji}</Text>
                   )}

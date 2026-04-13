@@ -1,10 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { View } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import * as SplashScreen from "expo-splash-screen";
 import { useAuthStore } from "../stores/authStore";
 import FloatingTabBar from "../components/FloatingTabBar";
+import AnimatedSplash from "../components/AnimatedSplash";
 import "../global.css";
+
+// 네이티브 스플래시를 앱이 준비될 때까지 유지
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const stackScreenStyle = {
   headerTintColor: "#FF6B81",
@@ -13,9 +18,23 @@ const stackScreenStyle = {
 
 export default function RootLayout() {
   const initialize = useAuthStore((s) => s.initialize);
+  const [splashDone, setSplashDone] = useState(false);
 
   useEffect(() => {
-    initialize();
+    async function prepare() {
+      try {
+        await initialize();
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        SplashScreen.hideAsync().catch(() => {});
+      }
+    }
+    prepare();
+  }, []);
+
+  const onSplashFinish = useCallback(() => {
+    setSplashDone(true);
   }, []);
 
   return (
@@ -41,6 +60,7 @@ export default function RootLayout() {
         <Stack.Screen name="profile-setup" options={{ headerShown: true, title: "프로필 설정", ...stackScreenStyle }} />
       </Stack>
       <FloatingTabBar />
+      {!splashDone && <AnimatedSplash onFinish={onSplashFinish} />}
     </View>
   );
 }
