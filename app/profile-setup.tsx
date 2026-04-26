@@ -4,13 +4,29 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Pressable,
   Alert,
   ScrollView,
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useAuthStore } from "../stores/authStore";
+
+const formatYMD = (d: Date) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
+const formatDisplay = (d: Date) => {
+  const y = d.getFullYear();
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  return `${y}년 ${m}월 ${day}일`;
+};
 
 export default function ProfileSetupScreen() {
   const router = useRouter();
@@ -18,23 +34,38 @@ export default function ProfileSetupScreen() {
 
   const [nickname, setNickname] = useState(profile?.nickname || "");
   const [babyNickname, setBabyNickname] = useState(profile?.baby_nickname || "");
-  const [dueDate, setDueDate] = useState(profile?.due_date || "");
+  const [dueDate, setDueDate] = useState<Date | null>(
+    profile?.due_date ? new Date(profile.due_date) : null
+  );
+  const [showPicker, setShowPicker] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // 기본 표시 날짜 (현재 + 약 280일)
+  const defaultPickerDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 280);
+    return d;
+  })();
+
+  const minDate = new Date();
+  const maxDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 310);
+    return d;
+  })();
+
+  const handleDateChange = (_event: DateTimePickerEvent, selected?: Date) => {
+    if (Platform.OS !== "ios") setShowPicker(false);
+    if (selected) setDueDate(selected);
+  };
 
   const handleSave = async () => {
     if (!nickname.trim()) {
       Alert.alert("알림", "닉네임을 입력해주세요");
       return;
     }
-    if (!dueDate.trim()) {
-      Alert.alert("알림", "출산예정일을 입력해주세요");
-      return;
-    }
-
-    // 날짜 형식 검증
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(dueDate)) {
-      Alert.alert("알림", "출산예정일을 YYYY-MM-DD 형식으로 입력해주세요\n예: 2026-11-20");
+    if (!dueDate) {
+      Alert.alert("알림", "출산예정일을 선택해주세요");
       return;
     }
 
@@ -42,7 +73,7 @@ export default function ProfileSetupScreen() {
     const result = await updateProfile({
       nickname: nickname.trim(),
       baby_nickname: babyNickname.trim() || null,
-      due_date: dueDate.trim(),
+      due_date: formatYMD(dueDate),
     });
     setLoading(false);
 
@@ -112,24 +143,61 @@ export default function ProfileSetupScreen() {
         <Text style={{ fontSize: 14, fontWeight: "600", color: "#2D2D2D", marginBottom: 8 }}>
           출산예정일 *
         </Text>
-        <TextInput
-          value={dueDate}
-          onChangeText={setDueDate}
-          placeholder="YYYY-MM-DD (예: 2026-11-20)"
-          placeholderTextColor="#9B9B9B"
-          keyboardType="numbers-and-punctuation"
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderRadius: 12,
-            padding: 16,
-            fontSize: 15,
-            marginBottom: 8,
-            color: "#2D2D2D",
-          }}
-        />
+        <Pressable
+          onPress={() => setShowPicker(true)}
+          style={({ pressed }) => [
+            {
+              backgroundColor: "#FFFFFF",
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 8,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            },
+            pressed && { opacity: 0.7 },
+          ]}
+        >
+          <Text
+            style={{
+              fontSize: 15,
+              color: dueDate ? "#2D2D2D" : "#9B9B9B",
+            }}
+          >
+            {dueDate ? formatDisplay(dueDate) : "날짜를 선택하세요"}
+          </Text>
+          <Text style={{ fontSize: 18 }}>📅</Text>
+        </Pressable>
         <Text style={{ fontSize: 12, color: "#9B9B9B", marginBottom: 30 }}>
-          병원에서 알려준 출산예정일을 입력해주세요
+          병원에서 알려준 출산예정일을 선택해주세요
         </Text>
+
+        {showPicker && (
+          <DateTimePicker
+            value={dueDate || defaultPickerDate}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            minimumDate={minDate}
+            maximumDate={maxDate}
+            onChange={handleDateChange}
+          />
+        )}
+
+        {/* iOS는 spinner라 직접 닫기 버튼 필요 */}
+        {showPicker && Platform.OS === "ios" && (
+          <TouchableOpacity
+            onPress={() => setShowPicker(false)}
+            style={{
+              backgroundColor: "#FFF0F3",
+              borderRadius: 10,
+              paddingVertical: 10,
+              alignItems: "center",
+              marginBottom: 20,
+            }}
+          >
+            <Text style={{ color: "#FF6B81", fontWeight: "600" }}>완료</Text>
+          </TouchableOpacity>
+        )}
 
         {/* 저장 버튼 */}
         <TouchableOpacity
