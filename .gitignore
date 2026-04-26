@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+# Brainstorm visual companion sessions
+.superpowers/
+
 # Expo
 .expo/
 dist/
