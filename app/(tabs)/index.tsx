@@ -48,7 +48,7 @@ export default function HomeScreen() {
           justifyContent: "center",
         }}
       >
-        <BabyGrowth weeks={20} size={64} />
+        <BabyGrowth weeks={20} size={theme.iconBox.lg} />
       </SafeAreaView>
     );
   }
@@ -121,19 +121,13 @@ export default function HomeScreen() {
 
         {/* 1차: 일기 영웅 카드 */}
         <View style={{ paddingHorizontal: theme.space[5], marginBottom: theme.space[3] }}>
-          <Card
-            variant="accent"
-            onPress={() =>
-              todayEntry ? router.push(`/diary/${todayEntry.id}`) : router.push("/diary/write")
-            }
-            padding={theme.space[5]}
-          >
+          <Card variant="accent" padding={theme.space[5]}>
             <Text
               style={{
                 fontSize: theme.font.overline.size,
                 fontWeight: "700",
                 color: theme.color.ink[0],
-                opacity: 0.9,
+                opacity: theme.opacity.pressedSubtle,
                 letterSpacing: theme.font.overline.letterSpacing,
               }}
             >
@@ -141,11 +135,11 @@ export default function HomeScreen() {
             </Text>
             <Text
               style={{
-                fontSize: 18,
+                fontSize: theme.font.hero.size,
                 fontWeight: "800",
                 color: theme.color.ink[0],
                 marginTop: theme.space[1],
-                lineHeight: 24,
+                lineHeight: theme.font.hero.lineHeight,
               }}
             >
               {todayEntry ? "오늘의 일기를 다시 보기" : `오늘 어떤 하루였어, ${babyName}맘?`}
@@ -154,25 +148,24 @@ export default function HomeScreen() {
               style={{
                 fontSize: theme.font.caption.size,
                 color: theme.color.ink[0],
-                opacity: 0.85,
-                marginTop: 4,
+                opacity: theme.opacity.pressed,
+                marginTop: theme.space[1],
               }}
             >
               {todayEntry ? "감정 + 기록을 확인하세요" : "감정 기록 + 사진 한 장으로 충분해요"}
             </Text>
-            <View
-              style={{
-                alignSelf: "flex-start",
-                backgroundColor: theme.color.ink[0],
-                paddingVertical: theme.space[2] + 1,
-                paddingHorizontal: theme.space[4],
-                borderRadius: theme.radius.md,
-                marginTop: theme.space[3],
-              }}
-            >
-              <Text style={{ color: theme.color.pink[500], fontSize: 13, fontWeight: "700" }}>
-                {todayEntry ? "기록 보기" : "✏ 일기 쓰기"}
-              </Text>
+            <View style={{ marginTop: theme.space[3], alignSelf: "flex-start" }}>
+              <Button
+                variant="onAccent"
+                size="sm"
+                onPress={() =>
+                  todayEntry
+                    ? router.push(`/diary/${todayEntry.id}`)
+                    : router.push("/diary/write")
+                }
+              >
+                {todayEntry ? "기록 보기" : "일기 쓰기"}
+              </Button>
             </View>
           </Card>
         </View>
@@ -181,7 +174,7 @@ export default function HomeScreen() {
         <View style={{ paddingHorizontal: theme.space[5], marginBottom: theme.space[3] - 1 }}>
           <Card variant="default" onPress={() => router.push("/tips")}>
             <View style={{ flexDirection: "row", alignItems: "center", gap: theme.space[3] }}>
-              <BabyGrowth weeks={weekData!.weeks} size={56} />
+              <BabyGrowth weeks={weekData!.weeks} size={theme.iconBox.lg} />
               <View style={{ flex: 1 }}>
                 <Text
                   style={{
@@ -228,8 +221,8 @@ export default function HomeScreen() {
               <View style={{ flexDirection: "row", alignItems: "center", gap: theme.space[3] }}>
                 <View
                   style={{
-                    width: 40,
-                    height: 40,
+                    width: theme.iconBox.md,
+                    height: theme.iconBox.md,
                     borderRadius: theme.radius.md,
                     backgroundColor: theme.color.pink[100],
                     alignItems: "center",
@@ -297,8 +290,8 @@ export default function HomeScreen() {
                 <View style={{ alignItems: "center" }}>
                   <View
                     style={{
-                      width: 32,
-                      height: 32,
+                      width: theme.iconBox.sm,
+                      height: theme.iconBox.sm,
                       borderRadius: theme.radius.sm + 1,
                       backgroundColor: item.iconBg,
                       marginBottom: theme.space[2] - 2,

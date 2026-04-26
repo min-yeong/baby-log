@@ -45,11 +45,14 @@ export const theme = {
     title: { size: 22, weight: "700" as const, lineHeight: 28 },
     heading: { size: 17, weight: "700" as const, lineHeight: 22 },
     body: { size: 14, weight: "400" as const, lineHeight: 20 },
+    bodyLg: { size: 15, weight: "400" as const, lineHeight: 22 },
     label: { size: 13, weight: "600" as const, lineHeight: 18 },
     caption: { size: 11, weight: "400" as const, lineHeight: 15 },
     overline: { size: 10, weight: "700" as const, lineHeight: 14, letterSpacing: 0.5 },
+    hero: { size: 18, weight: "800" as const, lineHeight: 24 },
   },
   space: { 1: 4, 2: 8, 3: 12, 4: 16, 5: 20, 6: 24, 8: 32 },
+  iconBox: { sm: 32, md: 40, lg: 56, xl: 80, xxl: 96 },
   radius: { sm: 8, md: 12, lg: 16, xl: 24, full: 9999 },
   shadow: {
     none: Platform.select({
@@ -78,6 +81,13 @@ export const theme = {
       default: {},
     })!,
   },
+  opacity: {
+    pressed: 0.85,
+    pressedSubtle: 0.9,
+    pressedStrong: 0.5,
+    disabledMuted: 0.4,
+  },
+  scrim: "rgba(0, 0, 0, 0.4)",
 } as const;
 
 export type Theme = typeof theme;

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Pressable, Text, ActivityIndicator, View, ViewStyle, TextStyle } from "react-native";
 import { theme } from "../../constants/theme";
 
-type Variant = "primary" | "secondary" | "ghost" | "dark";
+type Variant = "primary" | "secondary" | "ghost" | "dark" | "onAccent";
 type Size = "sm" | "md" | "lg";
 
 interface ButtonProps {
@@ -34,6 +34,8 @@ function getColors(variant: Variant, disabled: boolean) {
       return { bg: "transparent", fg: theme.color.ink[900], border: "transparent" };
     case "dark":
       return { bg: theme.color.ink[900], fg: theme.color.ink[0], border: "transparent" };
+    case "onAccent":
+      return { bg: theme.color.ink[0], fg: theme.color.pink[500], border: "transparent" };
   }
 }
 
