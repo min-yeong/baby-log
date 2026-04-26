@@ -14,6 +14,7 @@ const SCREEN_HEIGHT = Dimensions.get("window").height;
 export function Sheet({ visible, onClose, children }: SheetProps) {
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const dragY = useRef(new Animated.Value(0)).current;
+  const closeAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -29,12 +30,19 @@ export function Sheet({ visible, onClose, children }: SheetProps) {
     }
   }, [visible, translateY, dragY]);
 
+  useEffect(() => {
+    return () => {
+      closeAnimRef.current?.stop();
+    };
+  }, []);
+
   const close = () => {
-    Animated.timing(translateY, {
+    closeAnimRef.current = Animated.timing(translateY, {
       toValue: SCREEN_HEIGHT,
       duration: 220,
       useNativeDriver: true,
-    }).start(() => onClose());
+    });
+    closeAnimRef.current.start(() => onClose());
   };
 
   const onGesture = (e: PanGestureHandlerGestureEvent) => {

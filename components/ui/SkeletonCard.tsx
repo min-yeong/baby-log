@@ -19,7 +19,7 @@ export function SkeletonCard({ lines = 3, hasAvatar = false }: SkeletonCardProps
     );
     loop.start();
     return () => loop.stop();
-  }, [opacity]);
+  }, []);
 
   const bar = (width: string | number, height: number) => (
     <Animated.View

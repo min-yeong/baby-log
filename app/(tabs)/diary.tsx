@@ -55,13 +55,6 @@ const POPULAR_ITEMS: Record<EventType, string[]> = {
   checkup: ["1차 기형아", "2차 기형아", "당뇨검사", "정밀초음파", "NST검사"],
 };
 
-const EVENT_COLORS: Record<EventType, "hospital" | "checkup" | "symptom" | "medicine"> = {
-  hospital: "hospital",
-  checkup: "checkup",
-  symptom: "symptom",
-  medicine: "medicine",
-};
-
 function getDaysInMonth(year: number, month: number) { return new Date(year, month + 1, 0).getDate(); }
 function getFirstDayOfMonth(year: number, month: number) { return new Date(year, month, 1).getDay(); }
 function formatDate(y: number, m: number, d: number) { return `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`; }
@@ -122,7 +115,7 @@ export default function DiaryScreen() {
     const seen = new Set<string>();
     data.events.forEach((e) => {
       if (!seen.has(e.type)) {
-        dots.push(theme.color.semantic[EVENT_COLORS[e.type]]);
+        dots.push(theme.color.semantic[e.type]);
         seen.add(e.type);
       }
     });
@@ -137,27 +130,21 @@ export default function DiaryScreen() {
     return "late";
   }, [profile]);
 
-  const getOrderedChips = (type: EventType): { label: string; tag: "frequent" | "recommended" | "popular" }[] => {
+  const getOrderedChips = (type: EventType): string[] => {
     const seen = new Set<string>();
-    const result: { label: string; tag: "frequent" | "recommended" | "popular" }[] = [];
+    const result: string[] = [];
 
     const counts: Record<string, number> = {};
     events.filter((e) => e.type === type).forEach((e) => { counts[e.title] = (counts[e.title] || 0) + 1; });
     const frequent = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([t]) => t);
-    for (const item of frequent) {
-      if (!seen.has(item)) { result.push({ label: item, tag: "frequent" }); seen.add(item); }
-    }
-
     const recommended = WEEK_RECOMMENDED[type]?.[weekStage] || [];
-    for (const item of recommended) {
-      if (!seen.has(item)) { result.push({ label: item, tag: "recommended" }); seen.add(item); }
-    }
-
     const popular = POPULAR_ITEMS[type] || [];
-    for (const item of popular) {
-      if (!seen.has(item)) { result.push({ label: item, tag: "popular" }); seen.add(item); }
-    }
 
+    for (const source of [frequent, recommended, popular]) {
+      for (const item of source) {
+        if (!seen.has(item)) { result.push(item); seen.add(item); }
+      }
+    }
     return result;
   };
 
@@ -315,57 +302,61 @@ export default function DiaryScreen() {
             {selectedDate.slice(5).replace("-", ".")}
           </Text>
 
-          {selectedData?.diary && (
-            <View style={{ marginBottom: theme.space[3] }}>
-              <Card variant="default" onPress={() => router.push(`/diary/${selectedData.diary!.id}`)} padding={0}>
-                {selectedData.diary.photos && selectedData.diary.photos.length > 0 && (
-                  <View>
-                    {selectedData.diary.photos.length === 1 ? (
-                      <Image
-                        source={{ uri: selectedData.diary.photos[0].photo_url }}
-                        style={{ width: "100%", height: 180 }}
-                        contentFit="cover"
-                      />
-                    ) : (
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ height: 140 }}>
-                        {selectedData.diary.photos.map((photo) => (
-                          <Image
-                            key={photo.id}
-                            source={{ uri: photo.photo_url }}
-                            style={{ width: 180, height: 140, marginRight: 2 }}
-                            contentFit="cover"
-                          />
-                        ))}
-                      </ScrollView>
+          {selectedData?.diary && (() => {
+            const diary = selectedData.diary;
+            const emotion = EMOTIONS.find((e) => e.key === diary.emotion);
+            return (
+              <View style={{ marginBottom: theme.space[3] }}>
+                <Card variant="default" onPress={() => router.push(`/diary/${diary.id}`)} padding={0}>
+                  {diary.photos && diary.photos.length > 0 && (
+                    <View>
+                      {diary.photos.length === 1 ? (
+                        <Image
+                          source={{ uri: diary.photos[0].photo_url }}
+                          style={{ width: "100%", height: 180 }}
+                          contentFit="cover"
+                        />
+                      ) : (
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ height: 140 }}>
+                          {diary.photos.map((photo) => (
+                            <Image
+                              key={photo.id}
+                              source={{ uri: photo.photo_url }}
+                              style={{ width: 180, height: 140, marginRight: 2 }}
+                              contentFit="cover"
+                            />
+                          ))}
+                        </ScrollView>
+                      )}
+                    </View>
+                  )}
+                  <View style={{ padding: theme.space[4] }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", marginBottom: theme.space[2] }}>
+                      <Text style={{ fontSize: 28, marginRight: theme.space[2] + 2 }}>
+                        {emotion?.emoji || ""}
+                      </Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: theme.font.body.size, fontWeight: "700", color: theme.color.ink[900] }}>
+                          {emotion?.label || "일기"}
+                        </Text>
+                        <Text style={{ fontSize: theme.font.caption.size, color: theme.color.pink[400] }}>
+                          {diary.week_number}주차
+                        </Text>
+                      </View>
+                    </View>
+                    {diary.content && (
+                      <Text
+                        style={{ fontSize: theme.font.label.size, color: theme.color.ink[700], lineHeight: 20 }}
+                        numberOfLines={3}
+                      >
+                        {diary.content}
+                      </Text>
                     )}
                   </View>
-                )}
-                <View style={{ padding: theme.space[4] }}>
-                  <View style={{ flexDirection: "row", alignItems: "center", marginBottom: theme.space[2] }}>
-                    <Text style={{ fontSize: 28, marginRight: theme.space[2] + 2 }}>
-                      {EMOTIONS.find((e) => e.key === selectedData.diary!.emotion)?.emoji || ""}
-                    </Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ fontSize: theme.font.body.size, fontWeight: "700", color: theme.color.ink[900] }}>
-                        {EMOTIONS.find((e) => e.key === selectedData.diary!.emotion)?.label || "일기"}
-                      </Text>
-                      <Text style={{ fontSize: theme.font.caption.size, color: theme.color.pink[400] }}>
-                        {selectedData.diary.week_number}주차
-                      </Text>
-                    </View>
-                  </View>
-                  {selectedData.diary.content && (
-                    <Text
-                      style={{ fontSize: theme.font.label.size, color: theme.color.ink[700], lineHeight: 20 }}
-                      numberOfLines={3}
-                    >
-                      {selectedData.diary.content}
-                    </Text>
-                  )}
-                </View>
-              </Card>
-            </View>
-          )}
+                </Card>
+              </View>
+            );
+          })()}
 
           {EVENT_TYPES.map((evtType) => {
             const typeEvents = selectedData?.events.filter((e) => e.type === evtType.key) || [];
@@ -381,7 +372,7 @@ export default function DiaryScreen() {
                         width: theme.iconBox.sm,
                         height: theme.iconBox.sm,
                         borderRadius: theme.radius.md - 2,
-                        backgroundColor: theme.color.tint[EVENT_COLORS[evtType.key]],
+                        backgroundColor: theme.color.tint[evtType.key],
                         alignItems: "center",
                         justifyContent: "center",
                         marginRight: theme.space[3] - 2,
@@ -402,7 +393,7 @@ export default function DiaryScreen() {
                     <Text
                       style={{
                         fontSize: theme.font.caption.size + 1,
-                        color: hasEvents ? theme.color.semantic[EVENT_COLORS[evtType.key]] : theme.color.cream[300],
+                        color: hasEvents ? theme.color.semantic[evtType.key] : theme.color.cream[300],
                         fontWeight: "600",
                       }}
                     >
@@ -413,7 +404,7 @@ export default function DiaryScreen() {
                   {hasEvents && (
                     <View style={{ flexDirection: "row", flexWrap: "wrap", gap: theme.space[2] - 2 }}>
                       {typeEvents.map((evt) => (
-                        <Chip key={evt.id} color={EVENT_COLORS[evtType.key]} variant="solid">
+                        <Chip key={evt.id} color={evtType.key} variant="solid">
                           {evt.title}
                         </Chip>
                       ))}
@@ -447,11 +438,11 @@ export default function DiaryScreen() {
         />
         <Sheet.Content>
           <View style={{ flexDirection: "row", flexWrap: "wrap", gap: theme.space[2] }}>
-            {getOrderedChips(modalType).map(({ label: item }) => (
+            {getOrderedChips(modalType).map((item) => (
               <Chip
                 key={item}
                 selected={checkedItems.has(item)}
-                color={EVENT_COLORS[modalType]}
+                color={modalType}
                 onPress={() => toggleItem(item)}
               >
                 {item}

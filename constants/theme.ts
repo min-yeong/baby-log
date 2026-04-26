@@ -38,6 +38,11 @@ export const theme = {
       medicine: "#F3E5F5",
       danger: "#FFEBEE",
     },
+    brand: {
+      naver: "#03C75A",
+      kakao: "#FEE500",
+      kakaoText: "#3C1E1E",
+    },
     bg: "#FAF5EE",
   },
   font: {

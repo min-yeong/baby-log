@@ -23,9 +23,6 @@ function formatDistance(meters: number): string {
 
 type TabMode = "search" | "favorites";
 
-const NAVER_GREEN = theme.color.semantic.checkup;
-const KAKAO_YELLOW = theme.color.cream[100];
-
 export default function HospitalScreen() {
   const router = useRouter();
   const [tabMode, setTabMode] = useState<TabMode>("search");
@@ -111,7 +108,7 @@ export default function HospitalScreen() {
     );
   };
 
-  const renderHospital = ({ item, index }: { item: Hospital; index: number }) => (
+  const renderHospital = useCallback(({ item, index }: { item: Hospital; index: number }) => (
     <View style={{ paddingHorizontal: theme.space[5], marginBottom: theme.space[2] + 2 }}>
       <Card variant="default" onPress={() => router.push(`/hospital/${item.id}`)} padding={theme.space[5] - 2}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -228,7 +225,7 @@ export default function HospitalScreen() {
               pressed && { opacity: theme.opacity.pressed },
             ]}
           >
-            <Text style={{ fontSize: theme.font.caption.size + 1, color: NAVER_GREEN, fontWeight: "700" }}>네이버</Text>
+            <Text style={{ fontSize: theme.font.caption.size + 1, color: theme.color.brand.naver, fontWeight: "700" }}>네이버</Text>
           </Pressable>
 
           <Pressable
@@ -252,9 +249,9 @@ export default function HospitalScreen() {
         </View>
       </Card>
     </View>
-  );
+  ), [router, isFavorite]);
 
-  const renderFavorite = ({ item }: { item: typeof favorites[0] }) => (
+  const renderFavorite = useCallback(({ item }: { item: typeof favorites[0] }) => (
     <View style={{ paddingHorizontal: theme.space[5], marginBottom: theme.space[2] + 2 }}>
       <Card variant="default" padding={theme.space[5] - 2}>
         <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
@@ -297,7 +294,7 @@ export default function HospitalScreen() {
               {
                 flex: 1,
                 paddingVertical: theme.space[3] - 2,
-                backgroundColor: NAVER_GREEN,
+                backgroundColor: theme.color.brand.naver,
                 borderRadius: theme.radius.sm + 2,
                 alignItems: "center",
               },
@@ -313,19 +310,19 @@ export default function HospitalScreen() {
               {
                 flex: 1,
                 paddingVertical: theme.space[3] - 2,
-                backgroundColor: KAKAO_YELLOW,
+                backgroundColor: theme.color.brand.kakao,
                 borderRadius: theme.radius.sm + 2,
                 alignItems: "center",
               },
               pressed && { opacity: theme.opacity.pressed },
             ]}
           >
-            <Text style={{ fontSize: theme.font.label.size, fontWeight: "700", color: theme.color.ink[900] }}>카카오맵</Text>
+            <Text style={{ fontSize: theme.font.label.size, fontWeight: "700", color: theme.color.brand.kakaoText }}>카카오맵</Text>
           </Pressable>
         </View>
       </Card>
     </View>
-  );
+  ), [removeFavorite]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.color.bg }}>

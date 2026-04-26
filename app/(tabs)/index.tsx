@@ -1,5 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useMemo } from "react";
 import { useAuthStore } from "../../stores/authStore";
@@ -7,10 +8,17 @@ import { useDiaryStore } from "../../stores/diaryStore";
 import { calculatePregnancyWeek, getDaysUntilDue } from "../../lib/pregnancy";
 import { getWeekInfo } from "../../constants/babyGrowth";
 import { getUrgentTips } from "../../constants/weeklyTips";
-import { getBabySize } from "../../lib/babySize";
+import { eunNeun } from "../../lib/koreanParticle";
 import { theme } from "../../constants/theme";
 import { Button, Card, EmptyState, ScreenHeader } from "../../components/ui";
 import { BabyGrowth } from "../../components/illustrations/BabyGrowth";
+
+const SHORTCUTS = [
+  { route: "/(tabs)/chat", label: "AI 상담", iconBg: theme.color.pink[100], icon: require("../../assets/icons/ai_chat.png") },
+  { route: "/support/", label: "지원금", iconBg: theme.color.tint.medicine, icon: require("../../assets/icons/government_subsidies.png") },
+  { route: "/(tabs)/hospital", label: "병원", iconBg: theme.color.tint.hospital, icon: require("../../assets/icons/hospital.png") },
+  { route: "/nutrition", label: "영양", iconBg: theme.color.cream[100], icon: require("../../assets/icons/nutritional_supplements.png") },
+] as const;
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -34,8 +42,7 @@ export default function HomeScreen() {
     const daysLeft = getDaysUntilDue(profile.due_date);
     const weekInfo = getWeekInfo(weeks);
     const topTip = getUrgentTips(weeks)[0] || null;
-    const baby = getBabySize(weeks);
-    return { weeks, days, daysLeft, weekInfo, topTip, baby };
+    return { weeks, days, daysLeft, weekInfo, topTip };
   }, [profile]);
 
   if (loading) {
@@ -183,7 +190,7 @@ export default function HomeScreen() {
                     fontWeight: "600",
                   }}
                 >
-                  {weekData!.weeks}주차 · {weekData!.baby.weight} · {weekData!.baby.length}
+                  {weekData!.weeks}주차 · {weekData!.weekInfo?.weight} · {weekData!.weekInfo?.length}
                 </Text>
                 <Text
                   style={{
@@ -193,7 +200,7 @@ export default function HomeScreen() {
                     marginTop: 2,
                   }}
                 >
-                  {babyName}은 {weekData!.baby.name} 크기예요
+                  {babyName}{eunNeun(babyName)} {weekData!.weekInfo?.sizeCompare} 크기예요
                 </Text>
               </View>
               <Text style={{ color: theme.color.cream[300], fontSize: 16 }}>›</Text>
@@ -273,33 +280,37 @@ export default function HomeScreen() {
           >
             더 알아보기
           </Text>
-          <View style={{ flexDirection: "row", gap: theme.space[2] - 2 }}>
-            {[
-              { route: "/(tabs)/chat", label: "AI 상담", iconBg: theme.color.pink[100] },
-              { route: "/support/", label: "지원금", iconBg: theme.color.tint.medicine },
-              { route: "/(tabs)/hospital", label: "병원", iconBg: theme.color.tint.hospital },
-              { route: "/nutrition", label: "영양", iconBg: theme.color.cream[100] },
-            ].map((item) => (
+          <View style={{ flexDirection: "row", gap: theme.space[2] }}>
+            {SHORTCUTS.map((item) => (
               <Card
                 key={item.route}
                 variant="default"
                 onPress={() => router.push(item.route as any)}
-                padding={theme.space[3]}
+                padding={theme.space[4]}
                 style={{ flex: 1 }}
               >
                 <View style={{ alignItems: "center" }}>
                   <View
                     style={{
-                      width: theme.iconBox.sm,
-                      height: theme.iconBox.sm,
-                      borderRadius: theme.radius.sm + 1,
+                      width: theme.iconBox.lg,
+                      height: theme.iconBox.lg,
+                      borderRadius: theme.radius.md,
                       backgroundColor: item.iconBg,
-                      marginBottom: theme.space[2] - 2,
+                      marginBottom: theme.space[2],
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
                     }}
-                  />
+                  >
+                    <Image
+                      source={item.icon}
+                      style={{ width: theme.iconBox.lg - 12, height: theme.iconBox.lg - 12 }}
+                      contentFit="contain"
+                    />
+                  </View>
                   <Text
                     style={{
-                      fontSize: theme.font.caption.size,
+                      fontSize: theme.font.label.size,
                       fontWeight: "700",
                       color: theme.color.ink[900],
                     }}

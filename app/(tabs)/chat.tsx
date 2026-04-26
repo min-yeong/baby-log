@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -40,6 +40,13 @@ export default function ChatScreen() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const renderMessage = useCallback(
+    ({ item }: { item: DisplayMessage }) => (
+      <ChatBubble role={item.role} content={item.content} />
+    ),
+    []
+  );
 
   const handleSend = async (text?: string) => {
     const content = (text ?? input).trim();
@@ -88,9 +95,7 @@ export default function ChatScreen() {
           ref={flatListRef}
           data={messages}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ChatBubble role={item.role} content={item.content} />
-          )}
+          renderItem={renderMessage}
           contentContainerStyle={{ paddingVertical: theme.space[4] }}
           onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
         />
