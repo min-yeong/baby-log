@@ -1,29 +1,24 @@
 import { Tabs } from "expo-router";
-import { View, Text, Platform, useWindowDimensions } from "react-native";
+import { View, Text } from "react-native";
 import { Image } from "expo-image";
+import { theme } from "../../constants/theme";
+
+const ICON_SIZE = 24;
+const TAB_HEIGHT = 64;
 
 function TabIcon({ source, label, focused }: { source: any; label: string; focused: boolean }) {
-  const { width, height } = useWindowDimensions();
-  const isMobileView = Platform.OS !== "web";
-
-  // 화면 너비 500 이하 = 모바일 크기, 이상 = 데스크탑 크기
-  const isMobileSize = width <= 500;
-  const iconSize = isMobileSize
-    ? Math.floor(width * 0.10)   // 모바일: 너비의 10% (390px → 39pt)
-    : 32;                         // 데스크탑: 고정 32pt
-
   return (
     <View style={{ alignItems: "center", justifyContent: "center" }}>
       <Image
         source={source}
-        style={{ width: iconSize, height: iconSize }}
+        style={{ width: ICON_SIZE, height: ICON_SIZE }}
         contentFit="contain"
       />
       <Text
         style={{
-          fontSize: isMobileSize ? Math.floor(width * 0.03) : 11,
+          fontSize: theme.font.caption.size,
           fontWeight: focused ? "700" : "500",
-          color: focused ? "#FF6B81" : "#9B9B9B",
+          color: focused ? theme.color.pink[500] : theme.color.ink[400],
           marginTop: 2,
         }}
       >
@@ -34,22 +29,18 @@ function TabIcon({ source, label, focused }: { source: any; label: string; focus
 }
 
 export default function TabLayout() {
-  const { width, height } = useWindowDimensions();
-  const isMobileView = width <= 500;
-  const tabHeight = isMobileView ? Math.floor(height * 0.09) : 70;
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "#FFFFFF",
-          borderTopColor: "#FFD6DE",
+          backgroundColor: theme.color.ink[0],
+          borderTopColor: theme.color.cream[200],
           borderTopWidth: 1,
-          height: tabHeight,
-          paddingTop: isMobileView ? 2 : 6,
-          paddingBottom: isMobileView ? 2 : 6,
+          height: TAB_HEIGHT,
+          paddingTop: 6,
+          paddingBottom: 6,
         },
       }}
     >
@@ -78,22 +69,22 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="hospital"
+        name="chat"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={require("../../assets/icons/hospital.png")} label="산부인과" focused={focused} />
+            <TabIcon source={require("../../assets/icons/ai_chat.png")} label="AI상담" focused={focused} />
           ),
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="hospital"
         options={{ href: null }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabIcon source={require("../../assets/icons/mypage.png")} label="내 정보" focused={focused} />
+            <TabIcon source={require("../../assets/icons/mypage.png")} label="내정보" focused={focused} />
           ),
         }}
       />
