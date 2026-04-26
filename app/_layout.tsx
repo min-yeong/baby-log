@@ -6,7 +6,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { useAuthStore } from "../stores/authStore";
 import FloatingTabBar from "../components/FloatingTabBar";
 import AnimatedSplash from "../components/AnimatedSplash";
-import "../global.css";
 
 // 네이티브 스플래시를 앱이 준비될 때까지 유지
 SplashScreen.preventAutoHideAsync().catch(() => {});
