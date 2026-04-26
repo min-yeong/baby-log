@@ -31,6 +31,13 @@ export const theme = {
       medicine: "#BA68C8",
       danger: "#E57373",
     },
+    tint: {
+      hospital: "#E3F2FD",
+      checkup: "#E8F5E9",
+      symptom: "#FFF3E0",
+      medicine: "#F3E5F5",
+      danger: "#FFEBEE",
+    },
     bg: "#FAF5EE",
   },
   font: {

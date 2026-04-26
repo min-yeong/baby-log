@@ -22,14 +22,7 @@ function getColor(color: ChipColor): string {
 function getTintBg(color: ChipColor): string {
   if (color === "primary") return theme.color.pink[100];
   if (color === "neutral") return theme.color.cream[100];
-  const tints: Record<SemanticColor, string> = {
-    hospital: "#E3F2FD",
-    checkup: "#E8F5E9",
-    symptom: "#FFF3E0",
-    medicine: "#F3E5F5",
-    danger: "#FFEBEE",
-  };
-  return tints[color];
+  return theme.color.tint[color];
 }
 
 export function Chip({
